@@ -5,7 +5,11 @@ using System.Collections;
 
  	public float dampTime = 0.15f;
  	private Vector3 velocity = Vector3.zero;
+
  	private Rect screenRect;
+
+    private Ray ray;
+    private Vector3 newPos;
  
  	void Start()
  	{
@@ -13,36 +17,17 @@ using System.Collections;
      	screenRect = new Rect(0,0, Screen.width, Screen.height);
  	}
 
-     void Update () {
+     void FixedUpdate () {
 
-     	//if the mouse isn't within the window, easy out
- 		if (!screenRect.Contains(Input.mousePosition))
-     	return;
- 		
- 		//set the variable mouseScreen to mouseposition(screen)
-        Vector3 mouseScreen = Input.mousePosition;
+        //Only work when mouse is in the window
+        if (!screenRect.Contains(Input.mousePosition))
+        return;
 
- 		Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(mouseScreen);
- 		mouseWorld.z = -1;
+        ray = GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+        newPos = ray.GetPoint(15);
+        newPos.z = -1;
+        //transform.position = newPos;
+        transform.position = Vector3.SmoothDamp(transform.position, newPos, ref velocity, dampTime);
 
- 		transform.position = mouseWorld;
-     } 
- }
-
- public float dampTime = 0.15f;
-     private Vector3 velocity = Vector3.zero;
-     public Transform target;
- 
-     // Update is called once per frame
-     void Update () 
-     {
-         if (target)
-         {
-             Vector3 point = camera.WorldToViewportPoint(target.position);
-             Vector3 delta = target.position - camera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, point.z)); //(new Vector3(0.5, 0.5, point.z));
-             Vector3 destination = transform.position + delta;
-             transform.position = Vector3.SmoothDamp(transform.position, destination, ref velocity, dampTime);
-         }
-     
      }
  }
